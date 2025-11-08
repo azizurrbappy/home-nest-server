@@ -28,10 +28,21 @@ const run = async () => {
   try {
     await client.connect();
 
-    const db = client.db('');
+    const db = client.db('home-nest');
+    const propertiesCollection = db.collection('properties');
 
     // All apis endpoints
-    app.get('properties', (req, res) => {});
+    app.get('/properties', async (req, res) => {
+      const cursor = propertiesCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get('/featuredrealestate', async (req, res) => {
+      const cursor = propertiesCollection.find().sort({ postedDate: 1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     await client.db('admin').command({ ping: 1 });
     console.log(
