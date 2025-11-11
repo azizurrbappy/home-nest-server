@@ -46,7 +46,7 @@ const run = async () => {
     });
 
     app.get('/featuredrealestate', async (req, res) => {
-      const cursor = propertiesCollection.find().sort({ postedDate: 1 });
+      const cursor = propertiesCollection.find().sort({ postedDate: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });
