@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,6 +30,7 @@ const run = async () => {
 
     const db = client.db('home-nest');
     const propertiesCollection = db.collection('properties');
+    const usersCollection = db.collection('users');
 
     // All apis endpoints
     app.get('/properties', async (req, res) => {
@@ -38,10 +39,38 @@ const run = async () => {
       res.send(result);
     });
 
+    app.post('/properties', async (req, res) => {
+      const newProperty = req.body;
+      const result = await propertiesCollection.insertOne(newProperty);
+      res.send(result);
+    });
+
     app.get('/featuredrealestate', async (req, res) => {
       const cursor = propertiesCollection.find().sort({ postedDate: 1 });
       const result = await cursor.toArray();
       res.send(result);
+    });
+
+    app.get('/property/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await propertiesCollection.findOne(query);
+      res.send(result);
+    });
+
+    // USERS Api
+    app.post('/users', async (req, res) => {
+      const newUser = req.body;
+      const email = newUser.email;
+      const query = { email: email };
+      const existingUser = await usersCollection.findOne(query);
+
+      if (existingUser) {
+        res.send({ message: 'User credentials already exist.' });
+      } else {
+        const result = await usersCollection.insertOne(newUser);
+        res.send(result);
+      }
     });
 
     await client.db('admin').command({ ping: 1 });
