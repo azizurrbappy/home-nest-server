@@ -32,8 +32,35 @@ const run = async () => {
     const propertiesCollection = db.collection('properties');
     const usersCollection = db.collection('users');
 
-    // All apis endpoints
+    // Property Apis Endpoint
     app.get('/properties', async (req, res) => {
+      const getSortValue = parseInt(req.query.sort);
+      const getEmail = req.query.email;
+
+      if (getEmail) {
+        const query = { email: getEmail };
+        const result = await propertiesCollection
+          .find({ email: getEmail })
+          .toArray();
+        return res.send(result);
+      }
+
+      if (getSortValue === 1) {
+        const sort1 = await propertiesCollection
+          .find()
+          .sort({ propertyPrice: getSortValue })
+          .toArray();
+
+        return res.send(sort1);
+      } else if (getSortValue === -1) {
+        const sort2 = await propertiesCollection
+          .find()
+          .sort({ propertyPrice: getSortValue })
+          .toArray();
+
+        return res.send(sort2);
+      }
+
       const cursor = propertiesCollection.find();
       const result = await cursor.toArray();
       res.send(result);
@@ -58,7 +85,7 @@ const run = async () => {
       res.send(result);
     });
 
-    // USERS Api
+    // Users Apis Endpoint
     app.post('/users', async (req, res) => {
       const newUser = req.body;
       const email = newUser.email;
