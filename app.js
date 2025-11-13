@@ -31,6 +31,7 @@ const run = async () => {
     const db = client.db('home-nest');
     const propertiesCollection = db.collection('properties');
     const usersCollection = db.collection('users');
+    const reviewsCollection = db.collection('reviews');
 
     // Property Apis Endpoint
     app.get('/properties', async (req, res) => {
@@ -119,6 +120,32 @@ const run = async () => {
         const result = await usersCollection.insertOne(newUser);
         res.send(result);
       }
+    });
+
+    // Review Apis Endpoints
+    app.post('/review', async (req, res) => {
+      const getReview = req.body;
+      const result = await reviewsCollection.insertOne(getReview);
+      res.send(result);
+    });
+
+    // app.get('/reviews', async (req, res) => {
+    //   const result = await reviewsCollection.find().toArray();
+    //   res.send(result);
+    // });
+
+    app.get('/reviews/:propertyId', async (req, res) => {
+      const getPropertyId = req.params.propertyId;
+      const query = { propertyId: new ObjectId(getPropertyId) };
+      const result = await reviewsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get('/reviews', async (req, res) => {
+      const { email } = req.query;
+      const query = { reviewerEmail: email };
+      const result = await reviewsCollection.find(query).toArray();
+      res.send(result);
     });
 
     await client.db('admin').command({ ping: 1 });
