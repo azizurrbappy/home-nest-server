@@ -79,9 +79,30 @@ const run = async () => {
     });
 
     app.get('/property/:id', async (req, res) => {
-      const id = req.params.id;
+      const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const result = await propertiesCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.patch('/property/:id', async (req, res) => {
+      const { id } = req.params;
+      const updateProperty = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = { $set: updateProperty };
+      const options = {};
+      const result = await propertiesCollection.updateOne(
+        query,
+        update,
+        options
+      );
+      res.send(result);
+    });
+
+    app.delete('/properties/:id', async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: new ObjectId(id) };
+      const result = await propertiesCollection.deleteOne(query);
       res.send(result);
     });
 
